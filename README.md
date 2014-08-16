@@ -1,6 +1,6 @@
 # Drawer for Gamebuino
 
-An advanced drawing program for Gamebuino.
+Drawer is (will be) an advanced drawing program for Gamebuino with diferentiated tools, useful options, and more.
 
 ## Instructions
 
