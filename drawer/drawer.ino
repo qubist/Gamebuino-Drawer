@@ -77,6 +77,133 @@ const byte logo[] PROGMEM= {
 };
 
 //------------------------------------------------------------------------------
+//Canvas
+byte canvas[530] = {
+    84, 48
+};
+
+void paintPixel(byte x, byte y) {
+	int b = 2 + (y * 11) + (x/8);
+	canvas[b] |= 0x80 >> x%8;
+}
+
+void myDrawBitmap(byte x, byte y, byte *bitmap) {
+	byte xb = *(bitmap++);
+	byte yb = *(bitmap++);
+	byte rows = yb;
+	byte columns = xb/8 + ((xb%8) ? 1 : 0);
+	byte row,column,b;
+	for(row=0;row<rows;row++) {
+		for(column=0;column<columns;column++) {
+			for(b=0;b<8;b++) {
+				if ((0x80 >> b) & *bitmap ) gb.display.drawPixel(column*8+b,row);
+			}
+			bitmap++;
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+//Menus
+////declare all the variables needed to make a menu
+
+//number of items in the menu
+#define MAINMENULENGTH 5
+#define SETTINGSMENULENGTH 2
+#define CONFIRMMENULENGTH 2
+
+//The different strings to put in the menu
+//each string can be used in different menus
+const char strSettings[] PROGMEM = "Settings";
+const char strClear[] PROGMEM = "Clear";
+const char strSave[] PROGMEM = "Save";
+const char strExport[] PROGMEM = "Export";
+const char strQuit[] PROGMEM = "Quit";
+
+//Confirm clear
+const char strClearYes[] PROGMEM = "Yes, Clear";
+const char strClearNo[] PROGMEM = "No, Cancel";
+
+//Within settings
+const char strPenSize[] PROGMEM = "Pen Size";
+const char strEraserSize[] PROGMEM = "Eraser Size";
+
+
+//Put all the different items together in a menu (an array of strings actually)
+const char* const mainmenu[MAINMENULENGTH] PROGMEM = {
+	strSettings,
+	strClear,
+	strSave,
+  	strExport,
+	strQuit,
+};
+
+const char* const settingsmenu[SETTINGSMENULENGTH] PROGMEM = {
+	strPenSize,
+	strEraserSize,
+};
+
+const char* const clearmenu[CONFIRMMENULENGTH] PROGMEM = {
+	strClearYes,
+	strClearNo,
+};
+
+void doMenus(){
+	
+	boolean done = false;
+	
+	while(!done){
+		switch(gb.menu(mainmenu, MAINMENULENGTH)){
+ 				
+ 		  case 0: //Settings
+ 			
+ 		  	switch(gb.menu(settingsmenu, SETTINGSMENULENGTH)){
+ 					 					
+ 		    	  case 0: //Pen Size
+ 				  	//FIXME
+				    done = true;
+ 		        	break;
+ 					
+ 		    	  case 1: //Eraser Size
+ 				  	//FIXME
+			    	done = true;
+ 		        	break;
+
+ 		  	}
+ 		   	break;
+ 				
+ 		  case 1: //Clear
+		  	switch(gb.menu(clearmenu, CONFIRMMENULENGTH)){
+ 			case 0: //doClear
+ 				//FIXME
+		    	done = true;
+ 				break;
+ 				}
+ 			break;
+ 			case 2: //Save
+ 			   	//FIXME
+				done = true;
+ 			    break;
+ 				
+ 			case 3: //Export
+ 			   	//FIXME
+				done = true;
+ 			    break;
+ 				
+ 			case 4: //Quit
+ 				setup();
+				done = true;
+ 			    break;
+				
+			default:
+				done = true;
+				break;
+ 			
+ 			}
+ 		}
+}
+
+//------------------------------------------------------------------------------
 #define FRAMES_PER_SECOND 20
 
 boolean any_button_pressed() {
