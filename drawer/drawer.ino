@@ -241,13 +241,10 @@ void setup()
     gb.display.setFont(font5x7);
     gb.titleScreen(F(""), logo);
 	
-	gb.display.persistence = true;
-    gb.battery.show = true;
+    gb.battery.show = true; //Show battery or not
 	gb.setFrameRate(20);
     gb.display.clear();
-	
-    gb.pickRandomSeed();
-	
+		
     kc = 0;
     px = W/2;
     py = H/2;
@@ -323,7 +320,7 @@ void loop()
         pd = pd ? false : true; //toggle pen down
 	  }
       if(gb.buttons.pressed(BTN_B)) {
-        if(!pd) p_state = 0;
+        if(!pd) p_state = 0; //FIXME needs to be changed to paintPixel(px, xy, 0)
 	  }
       if(pd) {
    	   	paintPixel(px,py);
