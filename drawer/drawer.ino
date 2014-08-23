@@ -23,11 +23,10 @@ extern const byte font5x7[];
 
 byte px,py;
 boolean pd;
-byte p_state;
 
 byte kc;
 
-byte flash_color;
+byte flash_color = 0;
 
 //-------------------------------------
 //define images
@@ -253,26 +252,23 @@ void setup()
     px = W/2;
     py = H/2;
     pd = false;
-
-    p_state = 0;
 }
 
 //------------------------------------------------------------------------------
 void loop()
 {
     if(gb.update()) {
-		//------------------------------------------------------------------------------
-		//void drawer():		
-	    if (!pd){
-	    	if(!(gb.frameCount % 5)) { // !(gb.frameCount % 10) means (gb.frameCount % 10 == 0)
-		  	  flash_color = gb.display.getPixel(px,py) ? 0:1;
-	    	}
-			gb.display.setColor(flash_color);
-	      	gb.display.drawPixel(px,py);
-		}
-		
-      // <DO NOT TRY TO FIGURE OUT WHAT THIS CODE DOES!>
+		myDrawBitmap(0, 0, canvas);
+	  if (!pd){ //if pen up
+	  	if(!(gb.frameCount % 5)) { //Note: (!(gb.frameCount % 5)) means (gb.frameCount % 5 == 0)
+		  flash_color = !(flash_color);
+	    }
+		gb.display.setColor(flash_color);
+	    gb.display.drawPixel(px,py);
+	  }
 	  
+	  //if(this-is-so-I-can minimize-this-section-of-code-in-TextMate){
+      // <DO NOT TRY TO FIGURE OUT WHAT THIS CODE DOES!>	  
       boolean done = 0;
       if(gb.buttons.pressed(BTN_UP) && ((kc == 0) || (kc == 1))) {
         kc++;
@@ -305,15 +301,8 @@ void loop()
       if(done != 1) kc = 0;
       if(kc == 11) doKC();
       // </DO NOT TRY TO FIGURE OUT WHAT THIS CODE DOES!>
-
-      if(!pd && (gb.buttons.pressed(BTN_DOWN) || gb.buttons.pressed(BTN_UP) || gb.buttons.pressed(BTN_LEFT) || gb.buttons.pressed(BTN_RIGHT))) {
-		gb.display.setColor(p_state);		
-        gb.display.drawPixel(px,py);
-      }
+  	  //}
 	  
-      if(gb.buttons.pressed(BTN_C)) {
-		setup(); //reset
-      }
       if(gb.buttons.pressed(BTN_LEFT)) {
       	if(px == 0) px=W-1; //move left
         else px--;
@@ -336,13 +325,12 @@ void loop()
       if(gb.buttons.pressed(BTN_B)) {
         if(!pd) p_state = 0;
 	  }
-      if(!pd && (gb.buttons.pressed(BTN_DOWN) || gb.buttons.pressed(BTN_UP) || gb.buttons.pressed(BTN_LEFT) || gb.buttons.pressed(BTN_RIGHT))) {
-        p_state = gb.display.getPixel(px,py);
-      }
       if(pd) {
-		gb.display.setColor(1);
-   	   	gb.display.drawPixel(px,py);
-  		if(gb.buttons.pressed(BTN_A)) p_state = 1;
+   	   	paintPixel(px,py);
       }
-    }	
+	  if(gb.buttons.pressed(BTN_C)) {
+		  doMenus();
+      }
+
+  }	
 }
