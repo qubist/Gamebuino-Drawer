@@ -77,7 +77,8 @@ const byte logo[] PROGMEM= {
 
 //------------------------------------------------------------------------------
 //Canvas
-byte canvas[530] = {
+#define CANVAS_BYTE_LEN 530
+byte canvas[CANVAS_BYTE_LEN] = {
     84, 48
 };
 
@@ -93,20 +94,27 @@ void paintPixel(byte x, byte y, byte color) {
 	}
 }
 
-void myDrawBitmap(byte x, byte y, byte *bitmap) {
-	byte xb = *(bitmap++);
-	byte yb = *(bitmap++);
-	byte rows = yb;
-	byte columns = xb/8 + ((xb%8) ? 1 : 0);
-	byte row,column,b;
-	for(row=0;row<rows;row++) {
-		for(column=0;column<columns;column++) {
-			for(b=0;b<8;b++) {
-				if ((0x80 >> b) & *bitmap ) gb.display.drawPixel(column*8+b,row);
+void DrawBitmapRAM(int8_t x, int8_t y, const uint8_t *bitmap) {
+	int8_t w = bitmap[0];
+	int8_t h = bitmap[1];
+	bitmap = bitmap + 2; //add an offset to the pointer to start after the width and height
+#if (ENABLE_BITMAPS > 0)
+    int8_t i, j, byteWidth = (w + 7) / 8;
+    for (j = 0; j < h; j++) {
+        for (i = 0; i < w; i++) {
+			if (bitmap[j * byteWidth + i / 8] & (B10000000 >> (i % 8))) {
+				gb.display.drawPixel(x + i, y + j);
 			}
-			bitmap++;
-		}
-	}
+        }
+    }
+#else
+	drawRect(x, y, w, h);
+#endif
+}
+
+void clearCanvas() {
+	int pos;
+	for(pos=2; pos<CANVAS_BYTE_LEN; pos++) canvas[pos] = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -262,7 +270,7 @@ void setup()
 void loop()
 {
     if(gb.update()) {
-		myDrawBitmap(0, 0, canvas);
+		DrawBitmapRAM(0, 0, canvas);
 	  if (!pd){ //if pen up
 	  	if(!(gb.frameCount % 5)) { //Note: (!(gb.frameCount % 5)) means (gb.frameCount % 5 == 0)
 		  flash_color = !(flash_color);
