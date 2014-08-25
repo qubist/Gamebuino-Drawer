@@ -81,9 +81,16 @@ byte canvas[530] = {
     84, 48
 };
 
-void paintPixel(byte x, byte y) {
+void paintPixel(byte x, byte y, byte color) {
 	int b = 2 + (y * 11) + (x/8);
-	canvas[b] |= 0x80 >> x%8;
+	switch(color) {
+	case 1:
+		canvas[b] |= 0x80 >> x%8;
+		break;
+	case 0:
+		canvas[b] &= ~0x80 >> x%8;
+		break;
+	}
 }
 
 void myDrawBitmap(byte x, byte y, byte *bitmap) {
@@ -320,10 +327,10 @@ void loop()
         pd = pd ? false : true; //toggle pen down
 	  }
       if(gb.buttons.pressed(BTN_B)) {
-        if(!pd) p_state = 0; //FIXME needs to be changed to paintPixel(px, xy, 0)
+        if(!pd) paintPixel(px, py, 0);
 	  }
       if(pd) {
-   	   	paintPixel(px,py);
+   	   	paintPixel(px, py, 1);
       }
 	  if(gb.buttons.pressed(BTN_C)) {
 		  doMenus();
