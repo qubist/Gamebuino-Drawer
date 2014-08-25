@@ -158,8 +158,8 @@ const char* const settingsmenu[SETTINGSMENULENGTH] PROGMEM = {
 };
 
 const char* const clearmenu[CONFIRMMENULENGTH] PROGMEM = {
-	strClearYes,
 	strClearNo,
+	strClearYes,
 };
 
 void doMenus(){
@@ -188,8 +188,8 @@ void doMenus(){
  				
  		  case 1: //Clear
 		  	switch(gb.menu(clearmenu, CONFIRMMENULENGTH)){
- 			case 0: //doClear
- 				//FIXME
+ 			case 1: //Clear screen
+				clearCanvas();
 		    	done = true;
  				break;
  				}
